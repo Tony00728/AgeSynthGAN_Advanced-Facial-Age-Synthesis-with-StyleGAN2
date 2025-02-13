@@ -231,16 +231,12 @@ This code borrows heavily from [pixel2style2pixel](https://github.com/eladrich/p
 If you use this code for your research, please cite our paper :
 
 ```
-@article{alaluf2021matter,
-    author = {Alaluf, Yuval and Patashnik, Or and Cohen-Or, Daniel},
-    title = {Only a Matter of Style: Age Transformation Using a Style-Based Regression Model},
-    journal = {ACM Trans. Graph.},
-    issue_date = {August 2021},
-    volume = {40},
-    number = {4},
-    year = {2021},
-    articleno = {45},
-    publisher = {Association for Computing Machinery},
-    url = {https://doi.org/10.1145/3450626.3459805}
+@inproceedings{hsieh2024agesynthgan,
+  title={AgeSynthGAN: Advanced Facial Age Synthesis with StyleGAN2},
+  author={Hsieh, Tung-Ke and Liu, Tsung-Jung and Liu, Kuan-Hsien},
+  booktitle={2024 IEEE International Conference on Visual Communications and Image Processing (VCIP)},
+  pages={1--5},
+  year={2024},
+  organization={IEEE}
 }
 ```
