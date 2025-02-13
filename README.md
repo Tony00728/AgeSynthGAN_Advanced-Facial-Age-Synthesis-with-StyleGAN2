@@ -1,31 +1,6 @@
 # AgeSynthGAN_Advanced-Facial-Age-Synthesis-with-StyleGAN2 (VCIP 2024)
 
-> The  task of age transformation illustrates the change of an individual's appearance over time. Accurately modeling this complex transformation over an input facial image is extremely challenging as it requires making convincing and possibly large changes to facial features and head shape, while still preserving the input identity. In this work, we present an image-to-image translation method that learns to directly encode real facial images into the latent space of a pre-trained unconditional GAN (e.g., StyleGAN) subject to a given aging shift. We employ a pre-trained age regression network used to explicitly guide the encoder to generate the latent codes corresponding to the desired age. In this formulation, our method approaches the continuous aging process as a regression task between the input age and desired target age, providing fine-grained control on the generated image. Moreover, unlike other approaches that operate solely in the latent space using a prior on the path controlling age, our method learns a more disentangled, non-linear path. We demonstrate that the end-to-end nature of our approach, coupled with the rich semantic latent space of StyleGAN, allows for further editing of the generated images. Qualitative and quantitative evaluations show the advantages of our method compared to state-of-the-art approaches.
 
-<a href="https://arxiv.org/abs/2102.02754"><img src="https://img.shields.io/badge/arXiv-2008.00951-b31b1b.svg" height=22.5></a>
-<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" height=22.5></a>
-
-<a href="https://www.youtube.com/watch?v=zDTUbtmUbG8"><img src="https://img.shields.io/static/v1?label=Two Minute Papers&message=SAM Video&color=red" height=22.5></a>  
-<a href="https://youtu.be/X_pYC_LtBFw"><img src="https://img.shields.io/static/v1?label=SIGGRAPH 2021 &message=5 Minute Video&color=red" height=22.5></a>  
-<a href="https://replicate.ai/yuval-alaluf/sam"><img src="https://img.shields.io/static/v1?label=Replicate&message=Demo and Docker Image&color=darkgreen" height=22.5></a>
-
-
-Inference Notebook: &nbsp;<a href="http://colab.research.google.com/github/yuval-alaluf/SAM/blob/master/notebooks/inference_playground.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" height=22.5></a>  
-Animation Notebook: <a href="http://colab.research.google.com/github/yuval-alaluf/SAM/blob/master/notebooks/animation_inference_playground.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" height=22.5></a>
-
-
-<p align="center">
-<img src="docs/teaser.jpeg" width="800px"/>
-</p>
-
-## Description   
-Official Implementation of our Style-based Age Manipulation (SAM) paper for both training and evaluation. SAM 
-allows modeling fine-grained age transformation using a single input facial image
-
-<p align="center">
-<img src="docs/2195.jpg" width="800px"/>
-<img src="docs/1936.jpg" width="800px"/>
-</p>
 
 ## Table of Contents
   * [Getting Started](#getting-started)
@@ -38,12 +13,8 @@ allows modeling fine-grained age transformation using a single input facial imag
     + [Additional Notes](#additional-notes)
   * [Notebooks](#notebooks)
     + [Inference Notebook](#inference-notebook)
-    + [MP4 Notebook](#mp4-notebook)
   * [Testing](#testing)
     + [Inference](#inference)
-    + [Side-by-Side Inference](#side-by-side-inference)
-    + [Reference-Guided Inference](#reference-guided-inference)
-    + [Style Mixing](#style-mixing)
   * [Repository structure](#repository-structure)
   * [Credits](#credits)
   * [Acknowledgments](#acknowledgments)
@@ -68,7 +39,7 @@ Please download the pretrained aging model from the following links.
 | :--- | :----------
 |[SAM](https://drive.google.com/file/d/1XyumF6_fdAxFmxpFcmPf-q84LU_22EMC/view?usp=sharing)  | SAM trained on the FFHQ dataset for age transformation.
 
-You can run this to download it to the right place:
+download:
 
 ```
 mkdir pretrained_models
@@ -77,9 +48,7 @@ gdown "https://drive.google.com/u/0/uc?id=1XyumF6_fdAxFmxpFcmPf-q84LU_22EMC&expo
 wget "https://github.com/italojs/facial-landmarks-recognition/raw/master/shape_predictor_68_face_landmarks.dat"
 ```
 
-In addition, we provide various auxiliary models needed for training your own SAM model from scratch.  
-This includes the pretrained pSp encoder model for generating the encodings of the input image and the aging classifier 
-used to compute the aging loss during training.
+Pretrained_models
 
 | Path | Description
 | :--- | :----------
@@ -88,8 +57,7 @@ used to compute the aging loss during training.
 |[IR-SE50 Model](https://drive.google.com/file/d/1KW7bjndL3QG3sxBbZxreGHigcCCpsDgn/view?usp=sharing) | Pretrained IR-SE50 model taken from [TreB1eN](https://github.com/TreB1eN/InsightFace_Pytorch) for use in our ID loss during training.
 |[VGG Age Classifier](https://drive.google.com/file/d/1atzjZm_dJrCmFWCqWlyspSpr3nI6Evsh/view?usp=sharing) | VGG age classifier from DEX and fine-tuned on the FFHQ-Aging dataset for use in our aging loss
 
-By default, we assume that all auxiliary models are downloaded and saved to the directory `pretrained_models`. 
-However, you may use your own paths by changing the necessary values in `configs/path_configs.py`. 
+By default, we assume that all auxiliary models are downloaded and saved to the directory `pretrained_models` and change `configs/path_configs.py`. 
 
 ## Training
 ### Preparing your Data
@@ -111,15 +79,15 @@ DATASETS = {
 		'transforms': transforms_config.AgingTransforms,
 		'train_source_root': dataset_paths['ffhq'],
 		'train_target_root': dataset_paths['ffhq'],
-		'test_source_root': dataset_paths['celeba_test'],
-		'test_target_root': dataset_paths['celeba_test'],
+		'test_source_root': dataset_paths['test'],
+		'test_target_root': dataset_paths['test'],
 	}
 }
 ``` 
 When defining the datasets for training and inference, we will use the values defined in the above dictionary.
 
 
-### Training SAM
+### Training
 The main training script can be found in `scripts/train.py`.   
 Intermediate training results are saved to `opts.exp_dir`. This includes checkpoints, train outputs, and test outputs.  
 Additionally, if you have tensorboard installed, you can visualize tensorboard logs in `opts.exp_dir/logs`.
@@ -158,18 +126,6 @@ python scripts/train.py \
 - If you wish to resume from a specific checkpoint (e.g. a pretrained SAM model), you may do so using `--checkpoint_path`.
 
 
-## Notebooks 
-### Inference Notebook
-To help visualize the results of SAM we provide a Jupyter notebook found in `notebooks/inference_playground.ipynb`.   
-The notebook will download the pretrained aging model and run inference on the images found in `notebooks/images`.  
-
-In addition, [Replicate](https://replicate.ai/) have created a demo for SAM where you can easily upload an image and run SAM on a desired set of ages! Check
-out the demo [here](https://replicate.ai/yuval-alaluf/sam).
-
-### MP4 Notebook
-To show full lifespan results using SAM we provide an additional notebook `notebooks/animation_inference_playground.ipynb` that will 
-run aging on multiple ages between 0 and 100 and interpolate between the results to display full aging. 
-The results will be saved as an MP4 files in `notebooks/animations` showing the aging and de-aging results.
 
 ## Testing
 ### Inference
@@ -215,46 +171,6 @@ python scripts/inference_side_by_side.py \
 --target_age=0,10,20,30,40,50,60,70,80
 ```
 Here, all aging results 0,10,...,80 will be save side-by-side with the original input image.
-
-### Reference-Guided Inference
-In the paper, we demonstrated how one can perform style-mixing on the fine-level style inputs with a reference image
-to control global features such as hair color. For example, 
-
-<p align="center">
-<img src="docs/1005_style_mixing.jpg" width="800px"/>
-</p>
-
-To perform style mixing using reference images, we provide the script `reference_guided_inference.py`. Here, 
-we first perform aging using the specified target age(s). Then, style mixing is performed using the specified 
-reference images and the specified layers. For example, one can run: 
-```
-python scripts/reference_guided_inference.py \
---exp_dir=/path/to/experiment \
---checkpoint_path=experiment/checkpoints/best_model.pt \
---data_path=/path/to/test_data \
---test_batch_size=4 \
---test_workers=4 \
---ref_images_paths_file=/path/to/ref_list.txt \
---latent_mask=8,9 \
---target_age=50,60,70,80
-```
-Here, the reference images should be specified in the file defined by `--ref_images_paths_file` and should have the 
-following format:
-```
-/path/to/reference/1.jpg
-/path/to/reference/2.jpg
-/path/to/reference/3.jpg
-/path/to/reference/4.jpg
-/path/to/reference/5.jpg
-```
-In the above example, we will aging using 4 different target ages. For each target age, we first transform the 
-test samples defined by `--data_path` and then perform style mixing on layers 8,9 defined by `--latent_mask`. 
-The results of each target age are saved in its own sub-directory.
-
-### Style Mixing 
-Instead of performing style mixing using a reference image, you can perform style mixing using randomly generated 
-w latent vectors by running the script `style_mixing.py`. This script works in a similar manner to the reference
-guided inference except you do not need to specify the `--ref_images_paths_file` flag.
 
 ## Repository structure
 | Path | Description <img width=200>
@@ -312,7 +228,7 @@ https://github.com/eladrich/pixel2style2pixel/blob/master/LICENSE
 This code borrows heavily from [pixel2style2pixel](https://github.com/eladrich/pixel2style2pixel)
 
 ## Citation
-If you use this code for your research, please cite our paper <a href="https://arxiv.org/abs/2102.02754">Only a Matter of Style: Age Transformation Using a Style-Based Regression Model</a>:
+If you use this code for your research, please cite our paper :
 
 ```
 @article{alaluf2021matter,
