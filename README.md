@@ -9,7 +9,7 @@
   * [Pretrained Models](#pretrained-models)
   * [Training](#training)
     + [Preparing your Data](#preparing-your-data)
-    + [Training SAM](#training-sam)
+    + [Training model](#training-sam)
     + [Additional Notes](#additional-notes)
   * [Notebooks](#notebooks)
     + [Inference Notebook](#inference-notebook)
